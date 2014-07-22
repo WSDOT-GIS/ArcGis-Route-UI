@@ -43,56 +43,68 @@
 		return select;
 	}
 
-	function createTableFromObjectProperties(obj) {
-		var table, row, cell1, cell2, cell3, rowSpan, innerObj, propName, innerPropName, checkbox, defaultValue, control, label;
-		table = document.createElement("table");
+	function createParameterValueControlDiv(value, propertyName) {
+		var div, label, control;
+
+		div = document.createElement("div");
+		div.classList.add("form-group");
+
+		label = document.createElement("label");
+		label.textContent = propertyName;
+		div.appendChild(label);
+
+		if (propertyName === "Restriction Usage") {
+			control = createSelect(value);
+		} else {
+			control = document.createElement("input");
+			control.type = "number";
+			control.defaultValue = value;
+			control.value = value;
+		}
+		control.classList.add("form-control");
+		div.appendChild(control);
+
+		return div;
+	}
+
+	function createRestrictionControlsDiv(obj, restrictionParameterName) {
+		var div, checkbox, label, innerDiv, controlContainer;
+		div = document.createElement("div");
+		label = document.createElement("label");
+		checkbox = document.createElement("input");
+		checkbox.type = "checkbox";
+		label.appendChild(document.createTextNode(restrictionParameterName));
+		div.appendChild(checkbox);
+		div.appendChild(label);
+		controlContainer = document.createElement("div");
+		controlContainer.classList.add("container");
+		div.appendChild(controlContainer);
+		for (var propName in obj) {
+			if (obj.hasOwnProperty(propName)) {
+				innerDiv = createParameterValueControlDiv(obj[propName], propName);
+				controlContainer.appendChild(innerDiv);
+			}
+		}
+		return div;
+	}
+
+	function createFormFromObjectProperties(obj) {
+		var form, innerObj, propName, div;
+
+		form = document.createElement("form");
+		form.setAttribute("role", "form");
+		form.action = "#";
 
 		for (propName in obj) {
 			if (obj.hasOwnProperty(propName)) {
-				rowSpan = 0;
 				innerObj = obj[propName];
-				for (innerPropName in innerObj) {
-					if (innerObj.hasOwnProperty(innerPropName)) {
-						rowSpan += 1;
-						row = table.insertRow(-1);
-						if (rowSpan === 1) {
-							cell1 = row.insertCell(-1);
-							label = document.createElement("label");
-							checkbox = document.createElement("input");
-							checkbox.type = "checkbox";
-							checkbox.dataset.restrictionName = propName;
-							label.appendChild(checkbox);
-							label.appendChild(document.createTextNode(propName));
-							cell1.appendChild(label);
-						} else {
-							cell1.setAttribute("rowspan", rowSpan);
-						}
-						cell2 = row.insertCell(-1);
-						cell2.textContent = innerPropName;
-						cell3 = row.insertCell(-1);
-						defaultValue = innerObj[innerPropName];
-						if (innerPropName === "Restriction Usage") {
-							control = createSelect(defaultValue);
-						} else {
-							control = document.createElement("input");
-							control.type = "number";
-							control.defaultValue = defaultValue;
-							control.value = defaultValue;
-						}
-						control.dataset.restrictionName = propName;
-						control.dataset.restrictionParameterName = innerPropName;
-						control.dataset.restrictionParameterDefaultValue = defaultValue;
-						cell3.appendChild(control);
-					}
-				}
+				div = createRestrictionControlsDiv(innerObj, propName);
+				form.appendChild(div);
 			}
-			row = null;
-			cell1 = null;
-			cell2 = null;
 		}
-		
 
-		return table;
+
+		return form;
 	}
 
 	function parseTabSeparatedData(text) {
@@ -128,19 +140,9 @@
 		var request = new XMLHttpRequest();
 		request.open("get", url);
 		request.onloadend = function () {
-			var form, properties, table, submitButton, resetButton;
+			var form, properties;
 			properties = parseTabSeparatedData(this.response);
-			table = createTableFromObjectProperties(properties);
-			form = document.createElement("form");
-			form.appendChild(table);
-			submitButton = document.createElement("button");
-			submitButton.type = "submit";
-			submitButton.textContent = "Submit";
-			form.appendChild(submitButton);
-			resetButton = document.createElement("button");
-			resetButton.type = "reset";
-			resetButton.textContent = "Reset";
-			form.appendChild(resetButton);
+			form = createFormFromObjectProperties(properties);
 			document.getElementById(sectionId).appendChild(form);
 		};
 		request.send();

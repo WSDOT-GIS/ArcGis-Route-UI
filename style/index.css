@@ -1,19 +1,21 @@
-﻿table {
-	border-collapse: collapse;
-}
-td {
-	padding: 0.5em;
-	border-top: 1px solid black;
-	border-bottom: 1px solid black;
-}
-td:first-child {
-	border-left: 1px solid black;
-}
-td:last-child {
-	border-right: 1px solid black;
-}
-
-option.default {
+﻿option.default {
 	background-color: lightgreen;
 	font-weight: bold;
+}
+
+div.container {
+	margin-left: 2em;
+	border: 5px inset gray;
+	width: 300px;
+	padding: 0.5em 1em;
+	border-radius: 0 0 10px 10px;
+}
+
+/* Hide options for unchecked boxes. */
+input:not(:checked) ~div.container {
+	display: none;
+}
+
+label + input, label + select {
+	display: block;
 }

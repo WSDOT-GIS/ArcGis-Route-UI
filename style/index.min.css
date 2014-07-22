@@ -1,1 +1,1 @@
-﻿table{border-collapse:collapse}td{padding:.5em;border-top:1px solid #000;border-bottom:1px solid #000}td:first-child{border-left:1px solid #000}td:last-child{border-right:1px solid #000}option.default{background-color:#90ee90;font-weight:bold}
+﻿option.default{background-color:#90ee90;font-weight:bold}div.container{margin-left:2em;border:5px inset gray;width:300px;padding:.5em 1em;border-radius:0 0 10px 10px}input:not(:checked)~div.container{display:none}label+input,label+select{display:block}
