@@ -51,6 +51,10 @@
     <Content Include="data\sync\Attribute Parameter Values.txt" />
     <Content Include="index.html" />
     <Content Include="script\index.js" />
+    <Content Include="style\index.css" />
+    <Content Include="style\index.min.css">
+      <DependentUpon>index.css</DependentUpon>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />

@@ -31,9 +31,11 @@
 				option = document.createElement("option");
 				option.value = restrictionParameters[name];
 				option.label = name;
+				option.textContent = name;
 				if (name.match(re)) {
 					selected = document.createAttribute("selected");
 					option.setAttributeNode(selected);
+					option.classList.add("default");
 				}
 				select.appendChild(option);
 			}
@@ -66,7 +68,7 @@
 							cell1.setAttribute("rowspan", rowSpan);
 						}
 						cell2 = row.insertCell(-1);
-						cell2.innerText = innerPropName;
+						cell2.textContent = innerPropName;
 						cell3 = row.insertCell(-1);
 						defaultValue = innerObj[innerPropName];
 						if (innerPropName === "Restriction Usage") {
@@ -126,9 +128,20 @@
 		var request = new XMLHttpRequest();
 		request.open("get", url);
 		request.onloadend = function () {
-			var properties = parseTabSeparatedData(this.response);
-			var table = createTableFromObjectProperties(properties);
-			document.getElementById(sectionId).appendChild(table);
+			var form, properties, table, submitButton, resetButton;
+			properties = parseTabSeparatedData(this.response);
+			table = createTableFromObjectProperties(properties);
+			form = document.createElement("form");
+			form.appendChild(table);
+			submitButton = document.createElement("button");
+			submitButton.type = "submit";
+			submitButton.textContent = "Submit";
+			form.appendChild(submitButton);
+			resetButton = document.createElement("button");
+			resetButton.type = "reset";
+			resetButton.textContent = "Reset";
+			form.appendChild(resetButton);
+			document.getElementById(sectionId).appendChild(form);
 		};
 		request.send();
 	}

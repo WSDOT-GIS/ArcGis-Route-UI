@@ -1,0 +1,19 @@
+﻿table {
+	border-collapse: collapse;
+}
+td {
+	padding: 0.5em;
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+}
+td:first-child {
+	border-left: 1px solid black;
+}
+td:last-child {
+	border-right: 1px solid black;
+}
+
+option.default {
+	background-color: lightgreen;
+	font-weight: bold;
+}
