@@ -1,4 +1,4 @@
-﻿(function () {
+﻿require(["dojo/text!route-ui/data/sync/Attribute Parameter Values.txt"], function (syncValues) {
 
 	var usedIds = [];
 
@@ -175,7 +175,7 @@
 		while (match) {
 			// Remove the first element: the complete match.
 			match = match.slice(1);
-			
+
 			if (!output.hasOwnProperty(match[0])) {
 				output[match[0]] = {};
 			}
@@ -186,26 +186,8 @@
 		return output;
 	}
 
-	function requestParameterValues(url, sectionId) {
-		var section;
-		if (!url) {
-			throw new TypeError("The url parameter was not provided.");
-		}
-		section = document.getElementById(sectionId);
-		if (!section) {
-			throw new TypeError("The specified sectionId does not exist.");
-		}
-		var request = new XMLHttpRequest();
-		request.open("get", url);
-		request.onloadend = function () {
-			var form, properties;
-			properties = parseTabSeparatedData(this.response);
-			form = createFormFromObjectProperties(properties);
-			document.getElementById(sectionId).appendChild(form);
-		};
-		request.send();
-	}
-
-	requestParameterValues("data/sync/Attribute Parameter Values.txt", "syncSection");
-	requestParameterValues("data/async/Attribute Parameter Values.txt", "asyncSection");
-}());
+	var form, properties;
+	properties = parseTabSeparatedData(syncValues);
+	form = createFormFromObjectProperties(properties);
+	document.getElementById("syncSection").appendChild(form);
+});

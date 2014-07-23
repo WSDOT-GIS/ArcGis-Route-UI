@@ -45,12 +45,12 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="data\async\Attribute Parameter Values.txt" />
-    <Content Include="data\async\Restrictions.txt" />
-    <Content Include="data\sync\Attribute Names.txt" />
-    <Content Include="data\sync\Attribute Parameter Values.txt" />
     <Content Include="index.html" />
     <Content Include="script\index.js" />
+    <Content Include="script\route-ui\data\async\Attribute Parameter Values.txt" />
+    <Content Include="script\route-ui\data\async\Restrictions.txt" />
+    <Content Include="script\route-ui\data\sync\Attribute Names.txt" />
+    <Content Include="script\route-ui\data\sync\Attribute Parameter Values.txt" />
     <Content Include="style\index.css" />
     <Content Include="style\index.min.css">
       <DependentUpon>index.css</DependentUpon>

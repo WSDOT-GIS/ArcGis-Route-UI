@@ -11,6 +11,22 @@
 	<section id="asyncSection">
 		<h1>Async Parameters</h1>
 	</section>
+	<script>
+		(function () {
+			var root = location.pathname.replace(/\/[^\/]*$/, "");
+			var dojoConfig = {
+				async: true,
+				packages: [
+					{
+						name: "route-ui",
+						location: root + "/script/route-ui"
+					}
+				]
+			};
+			window.dojoConfig = dojoConfig;
+		}());
+	</script>
+	<script src="//js.arcgis.com/3.10compact/"></script>
 	<script src="script/index.js"></script>
 </body>
 </html>
