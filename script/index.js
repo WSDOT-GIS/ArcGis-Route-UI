@@ -1,5 +1,53 @@
 ﻿(function () {
 
+	var usedIds = [];
+
+	// Add an Array.contains function if it does not already exist.
+	if (!Array.prototype.contains) {
+		/**
+		 * Determines if the array contains the given item
+		 * @param {string} item
+		 * @returns {Array}
+		 */
+		Array.prototype.contains = function (item) {
+			var output = false;
+			for (var i = 0, l = this.length; i < l; i += 1) {
+				if (this[i] === item) {
+					output = true;
+					break;
+				}
+			}
+			return output;
+		};
+	}
+
+	/**
+	 * Generates a unique ID based on an input string.
+	 * @param {string} base
+	 * @returns {string}
+	 */
+	function createId(base) {
+		var output, i = 0;
+		base = base || "id_";
+		if (/^[^a-z_]/i.test(base)) {
+			base = "id_" + base;
+		}
+
+		base = base.replace(/\W+/g, "_");
+
+		output = base;
+
+		while (usedIds.contains(output) || document.getElementById(output)) {
+			output = [base, i].join("_");
+			i += 1;
+		}
+
+		//output = [base, Date.now() + Math.random()].join("_");
+		//output = output.replace(/\W/g, "_");
+		usedIds.push();
+		return output;
+	}
+
 	var restrictionParameters = {
 		/** @member {number} Travel on the roads using the restriction is completely prohibited.*/
 		Prohibited: -1,
@@ -23,9 +71,15 @@
 	 * @returns {HTMLSelectElement}
 	 */
 	function createSelect(defaultValue) {
-		var select, option, re, selected;
+		var select, option, re, selected, avoidGroup, preferGroup, avoidRe = /^Avoid/i, preferRe = /^Prefer/;
 		re = new RegExp(defaultValue, "i");
 		select = document.createElement("select");
+		avoidGroup = document.createElement("optgroup");
+		avoidGroup.label = "Avoid";
+		select.appendChild(avoidGroup);
+		preferGroup = document.createElement("optgroup");
+		preferGroup.label = "Prefer";
+		select.appendChild(preferGroup);
 		for (var name in restrictionParameters) {
 			if (restrictionParameters.hasOwnProperty(name)) {
 				option = document.createElement("option");
@@ -37,7 +91,7 @@
 					option.setAttributeNode(selected);
 					option.classList.add("default");
 				}
-				select.appendChild(option);
+				(avoidRe.test(name) ? avoidGroup : preferRe.test(name) ? preferGroup : select).appendChild(option);
 			}
 		}
 		return select;
@@ -61,6 +115,8 @@
 			control.defaultValue = value;
 			control.value = value;
 		}
+		control.id = createId(propertyName);
+		label.htmlFor = control.id;
 		control.classList.add("form-control");
 		div.appendChild(control);
 
@@ -73,6 +129,8 @@
 		label = document.createElement("label");
 		checkbox = document.createElement("input");
 		checkbox.type = "checkbox";
+		checkbox.id = createId(restrictionParameterName);
+		label.htmlFor = checkbox.id;
 		label.appendChild(document.createTextNode(restrictionParameterName));
 		div.appendChild(checkbox);
 		div.appendChild(label);
