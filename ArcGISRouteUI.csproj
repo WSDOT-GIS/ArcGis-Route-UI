@@ -51,6 +51,7 @@
     <Content Include="script\route-ui\data\async\Restrictions.txt" />
     <Content Include="script\route-ui\data\sync\Attribute Names.txt" />
     <Content Include="script\route-ui\data\sync\Attribute Parameter Values.txt" />
+    <Content Include="script\route-ui\main.js" />
     <Content Include="style\index.css" />
     <Content Include="style\index.min.css">
       <DependentUpon>index.css</DependentUpon>
