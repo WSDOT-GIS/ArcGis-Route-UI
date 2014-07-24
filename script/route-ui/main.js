@@ -1,11 +1,12 @@
 ﻿/*global define*/
 define([
-	"require",
+	"dojo/Evented", 
+	"dojo/_base/declare",
 	"dojo/text!./data/sync/Attribute Parameter Values.txt",
 	"dojo/text!./data/async/Attribute Parameter Values.txt",
 	"dojo/text!./data/sync/Attribute Names.txt",
 	"dojo/text!./data/async/Restrictions.txt"
-], function (require, syncValues, asyncValues, syncDescriptions, asyncDescriptions) {
+], function (Evented, declare, syncValues, asyncValues, syncDescriptions, asyncDescriptions) {
 
 	var usedIds = [];
 
@@ -167,7 +168,7 @@ define([
 	 * @return {HTMLFormElement}
 	 */
 	function createFormFromObjectProperties(obj) {
-		var form, innerObj, propName, div;
+		var form, innerObj, propName, div, submitButton, resetButton;
 
 		form = document.createElement("form");
 		form.setAttribute("role", "form");
@@ -181,6 +182,15 @@ define([
 			}
 		}
 
+		submitButton = document.createElement("button");
+		submitButton.type = "submit";
+		submitButton.innerText = "Submit";
+		form.appendChild(submitButton);
+
+		resetButton = document.createElement("button");
+		resetButton.type = "reset";
+		resetButton.innerText = "Reset";
+		form.appendChild(resetButton);
 
 		return form;
 	}
@@ -247,20 +257,77 @@ define([
 		return output;
 	}
 
-	/**
-	 * 
-	 */
-	function ArcGisRouteUI(serviceType) {
-		var form, properties;
-		if (serviceType === "async") {
-			properties = parseTabSeparatedData(asyncValues);
-		} else {
-			properties = parseTabSeparatedData(syncValues);
+	///**
+	// * @param {boolean} async - Set to true for async routing service, false for sync.
+	// * @property {HTMLFormElement} form
+	// * @property {Object} properties
+	// * @property {Object.<string, RestrictionInfo>} descriptions
+	// */
+	//function ArcGisRouteUI(async) {
+	//	var self = this;
+
+	//	function onFormSubmit() {
+	//		var event = new CustomEvent("route-params-submit", {
+	//			detail: "Submitted route parameters go here"
+	//		});
+	//		self.form.dispatchEvent(event);
+	//		return false;
+	//	}
+
+	//	var form, properties, descriptions;
+	//	if (async) {
+	//		properties = parseTabSeparatedData(asyncValues);
+	//		descriptions = parseDescriptions(asyncDescriptions);
+	//	} else {
+	//		properties = parseTabSeparatedData(syncValues);
+	//		descriptions = parseDescriptions(syncDescriptions);
+	//	}
+	//	form = createFormFromObjectProperties(properties);
+	//	form.onsubmit = onFormSubmit;
+	//	this.form = form;
+	//	this.properties = properties;
+	//	this.descriptions = descriptions;
+	//}
+
+	var ArcGisRouteUI = declare([Evented], {
+		form: null,
+		properties: null,
+		descriptions: null,
+		/**
+		 * @param {boolean} async - Set to true for async routing service, false for sync.
+		 * @property {HTMLFormElement} form
+		 * @property {Object} properties
+		 * @property {Object.<string, RestrictionInfo>} descriptions
+		 */
+		constructor: function (async) {
+			var self = this;
+
+			function onFormSubmit() {
+				////var event = new CustomEvent("route-params-submit", {
+				////	detail: "Submitted route parameters go here"
+				////});
+				////self.form.dispatchEvent(event);
+
+				self.emit("route-params-submit", { detail: "Submitted route parameters go here" });
+
+				return false;
+			}
+
+			var form, properties, descriptions;
+			if (async) {
+				properties = parseTabSeparatedData(asyncValues);
+				descriptions = parseDescriptions(asyncDescriptions);
+			} else {
+				properties = parseTabSeparatedData(syncValues);
+				descriptions = parseDescriptions(syncDescriptions);
+			}
+			form = createFormFromObjectProperties(properties);
+			form.onsubmit = onFormSubmit;
+			this.form = form;
+			this.properties = properties;
+			this.descriptions = descriptions;
 		}
-		form = createFormFromObjectProperties(properties);
-		this.form = form;
-		this.properties = properties;
-	}
+	});
 
 
 
