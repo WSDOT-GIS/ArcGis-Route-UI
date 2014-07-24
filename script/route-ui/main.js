@@ -1,5 +1,11 @@
 ﻿/*global define*/
-define(["require", "dojo/text!./data/sync/Attribute Parameter Values.txt"], function (require, syncValues) {
+define([
+	"require",
+	"dojo/text!./data/sync/Attribute Parameter Values.txt",
+	"dojo/text!./data/async/Attribute Parameter Values.txt",
+	"dojo/text!./data/sync/Attribute Names.txt",
+	"dojo/text!./data/async/Restrictions.txt"
+], function (require, syncValues, asyncValues, syncDescriptions, asyncDescriptions) {
 
 	var usedIds = [];
 
@@ -209,12 +215,54 @@ define(["require", "dojo/text!./data/sync/Attribute Parameter Values.txt"], func
 		return output;
 	}
 
+	/**
+	 * @typedef {RestrictionInfo}
+	 * @propery {string} description - A description of the restriction.
+	 * @property {string} availability - The availability of the restriction.
+	 */
 
+	/**
+	 * Parses the descriptions text table.
+	 * @param {string} text
+	 * @returns {Object.<string, RestrictionInfo>}
+	 */
+	function parseDescriptions(text) {
+		var re = /^([^\t\n\r]+)\t([^\t\r\n]+)\t([^\t\r\n]+)$/gm; // Matches ["restriction name", "description", "availability"]
+		var match;
+		var output = {};
+		match = re.exec(text);
+		// Skip first row: column headings.
+		match = re.exec(text);
+		while (match) {
+			// Remove the first element: the complete match.
+			match = match.slice(1);
 
-	return function () {
+			output[match[0]] = {
+				description: match[1],
+				availability: match[2]
+			};
+
+			match = re.exec(text);
+		}
+		return output;
+	}
+
+	/**
+	 * 
+	 */
+	function ArcGisRouteUI(serviceType) {
 		var form, properties;
-		properties = parseTabSeparatedData(syncValues);
+		if (serviceType === "async") {
+			properties = parseTabSeparatedData(asyncValues);
+		} else {
+			properties = parseTabSeparatedData(syncValues);
+		}
 		form = createFormFromObjectProperties(properties);
-		return form;
-	};
+		this.form = form;
+		this.properties = properties;
+	}
+
+
+
+	return ArcGisRouteUI;
 });
