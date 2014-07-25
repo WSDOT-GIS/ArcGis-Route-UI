@@ -168,11 +168,15 @@ define([
 	 * @return {HTMLFormElement}
 	 */
 	function createFormFromObjectProperties(obj) {
-		var form, innerObj, propName, div, submitButton, resetButton;
+		var form, innerObj, propName, div, submitButton, resetButton, stopList;
 
 		form = document.createElement("form");
 		form.setAttribute("role", "form");
 		form.action = "#";
+
+		stopList = document.createElement("ol");
+		stopList.classList.add("stop-list");
+		form.appendChild(stopList);
 
 		for (propName in obj) {
 			if (obj.hasOwnProperty(propName)) {
@@ -257,50 +261,73 @@ define([
 		return output;
 	}
 
-	///**
-	// * @param {boolean} async - Set to true for async routing service, false for sync.
-	// * @property {HTMLFormElement} form
-	// * @property {Object} properties
-	// * @property {Object.<string, RestrictionInfo>} descriptions
-	// */
-	//function ArcGisRouteUI(async) {
-	//	var self = this;
+	/**
+	 * Removes a list item from a list.
+	 * Called from a link that is the child of
+	 * a list item.
+	 * @param {Event} e
+	 * @param {HTMLAnchorElement} e.target
+	 */
+	function removeItemFromList(e) {
+		var link = e.target;
+		var listItem = link.parentElement;
+		var list = listItem.parentElement;
+		list.removeChild(listItem);
 
-	//	function onFormSubmit() {
-	//		var event = new CustomEvent("route-params-submit", {
-	//			detail: "Submitted route parameters go here"
-	//		});
-	//		self.form.dispatchEvent(event);
-	//		return false;
-	//	}
+		return false;
+	}
 
-	//	var form, properties, descriptions;
-	//	if (async) {
-	//		properties = parseTabSeparatedData(asyncValues);
-	//		descriptions = parseDescriptions(asyncDescriptions);
-	//	} else {
-	//		properties = parseTabSeparatedData(syncValues);
-	//		descriptions = parseDescriptions(syncDescriptions);
-	//	}
-	//	form = createFormFromObjectProperties(properties);
-	//	form.onsubmit = onFormSubmit;
-	//	this.form = form;
-	//	this.properties = properties;
-	//	this.descriptions = descriptions;
-	//}
+	function createStopListItem(stop) {
+		var li, removeLink, feature;
+		console.log("stop", stop);
+		if (stop.feature) {
+			if (stop.feature.toJson) {
+				feature = stop.feature.toJson();
+			} else {
+				feature = stop.feature;
+			}
+			li = document.createElement("li");
+			// TODO: place attribute value here instead of generic text.
+			li.textContent = stop.name || "STOP ";
+			removeLink = document.createElement("a");
+			removeLink.href = "#";
+			removeLink.classList.add("remove-link");
+			removeLink.textContent = "remove";
+			li.appendChild(removeLink);
+			li.setAttribute("data-graphic", JSON.stringify(stop));
+			removeLink.onclick = removeItemFromList;
+		}
+		return li;
+	}
 
+	/*
+	 * @property {HTMLFormElement} form
+	 * @property {Object} properties
+	 * @property {Object.<string, RestrictionInfo>} descriptions
+	 */
 	var ArcGisRouteUI = declare([Evented], {
 		form: null,
 		properties: null,
 		descriptions: null,
+		stopList: null,
+		/**
+		 * @param {esri/Graphic} stop
+		 */
+		addStop: function (stop) {
+			var li;
+			if (!stop) {
+				throw new TypeError("No stop was provided.");
+			} else if (stop.feature) {
+				li = createStopListItem(stop);
+				this.stopList.appendChild(li);
+			}
+		},
 		/**
 		 * @param {boolean} async - Set to true for async routing service, false for sync.
-		 * @property {HTMLFormElement} form
-		 * @property {Object} properties
-		 * @property {Object.<string, RestrictionInfo>} descriptions
+		 * @constructs
 		 */
 		constructor: function (async) {
-			var self = this;
+			var self = this, form, properties, descriptions, stopList;
 
 			function onFormSubmit() {
 				////var event = new CustomEvent("route-params-submit", {
@@ -313,7 +340,6 @@ define([
 				return false;
 			}
 
-			var form, properties, descriptions;
 			if (async) {
 				properties = parseTabSeparatedData(asyncValues);
 				descriptions = parseDescriptions(asyncDescriptions);
@@ -324,6 +350,7 @@ define([
 			form = createFormFromObjectProperties(properties);
 			form.onsubmit = onFormSubmit;
 			this.form = form;
+			this.stopList = form.querySelector(".stop-list");
 			this.properties = properties;
 			this.descriptions = descriptions;
 		}

@@ -2,15 +2,16 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<title>ArcGIS Routing Parameters</title>
+	<link rel="stylesheet" href="//js.arcgis.com/3.10compact/js/esri/css/esri.css">
 	<link href="style/index.min.css" rel="stylesheet" />
 </head>
 <body>
-	<section id="syncSection">
-		<h1>Sync Parameters</h1>
-	</section>
-	<section id="asyncSection">
-		<h1>Async Parameters</h1>
-	</section>
+	<div id="map">
+
+	</div>
+	<div id="toolsPane">
+		<div id="geocoder"></div>
+	</div>
 	<script>
 		(function () {
 			var root = location.pathname.replace(/\/[^\/]*$/, "");
