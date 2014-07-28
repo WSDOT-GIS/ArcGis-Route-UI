@@ -1,13 +1,13 @@
 ﻿/*global require*/
 require(["esri/map", "esri/dijit/Geocoder", "route-ui"], function (Map, Geocoder, RouteUI) {
-	var map, syncRouteUI, geocoder;
+	var map, routeUI, geocoder;
 	map = new Map("map", {
 		basemap: "gray"
 	});
-	syncRouteUI = new RouteUI();
-	document.getElementById("toolsPane").appendChild(syncRouteUI.form);
+	routeUI = new RouteUI();
+	document.getElementById("toolsPane").appendChild(routeUI.form);
 
-	syncRouteUI.on("route-params-submit", function (e) {
+	routeUI.on("route-params-submit", function (e) {
 		console.log(e);
 	});
 
@@ -39,13 +39,13 @@ require(["esri/map", "esri/dijit/Geocoder", "route-ui"], function (Map, Geocoder
 	 */
 
 	/**
-	 * @param {(SelectResult|Findresult)} result
+	 * @param {(SelectResult|FindResult)} result
 	 */
 	function onResult(result) {
 		var results = result.results ? result.results.results : result.result ? [result.result] : null;
 		if (results) {
 			results.forEach(function (result) {
-				syncRouteUI.addStop(result);
+				routeUI.addStop(result);
 			});
 		}
 	}

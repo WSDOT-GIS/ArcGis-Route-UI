@@ -327,7 +327,7 @@ define([
 		 * @constructs
 		 */
 		constructor: function (async) {
-			var self = this, form, properties, descriptions, stopList;
+			var self = this, form, properties, descriptions;
 
 			function onFormSubmit() {
 				////var event = new CustomEvent("route-params-submit", {
