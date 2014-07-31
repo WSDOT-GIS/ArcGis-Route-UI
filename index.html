@@ -3,15 +3,20 @@
 <head>
 	<title>ArcGIS Routing Parameters</title>
 	<link rel="stylesheet" href="//js.arcgis.com/3.10compact/js/esri/css/esri.css">
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
 	<link href="style/index.min.css" rel="stylesheet" />
 </head>
 <body>
-	<div id="mainContainer">
-		<div id="map">
-
-		</div>
-		<div id="toolsPane">
-			<div id="geocoder"></div>
+	<div id="mainContainer" class="container-fluid">
+		
+		<div class="row">
+			<div class="col-md-9">
+				<div id="map"></div>
+			</div>
+			<div id="toolsPane" class="col-md-3 container">
+				<div id="geocoder"></div>
+			</div>
 		</div>
 	</div>
 	<script>
@@ -30,6 +35,9 @@
 		}());
 	</script>
 	<script src="//js.arcgis.com/3.10compact/"></script>
-	<script src="script/index.js"></script>
+	<!-- Latest compiled and minified JavaScript -->
+	<script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="script/index.js"></script>
 </body>
 </html>

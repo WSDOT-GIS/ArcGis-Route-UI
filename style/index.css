@@ -1,21 +1,39 @@
-﻿option.default {
-	background-color: lightgreen;
-	font-weight: bold;
+﻿html, body {
+	width: 100%;
+	height: 100%;
+	margin: 0;
+	overflow-y:hidden;
 }
 
-div.container {
-	margin-left: 2em;
-	border: 5px inset gray;
-	width: 300px;
-	padding: 0.5em 1em;
-	border-radius: 0 0 10px 10px;
+#toolsPane {
+	overflow-y: auto;
+}
+
+#mainContainer, #mainContainer > div, #mainContainer > div > div, #map {
+	height: 100%;
+}
+
+option.default {
+	background-color: lightgreen;
 }
 
 /* Hide options for unchecked boxes. */
-input:not(:checked) ~div.container {
+input:not(:checked) ~div.restriction-container {
 	display: none;
 }
 
 label + input, label + select {
 	display: block;
+}
+
+#Restrictions .panel-body, #Stops .panel-body {
+	overflow: auto;
+}
+
+#Stops .panel-body {
+	max-height: 300px;
+}
+
+#Restrictions .panel-body {
+	max-height: 400px;
 }
