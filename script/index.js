@@ -1,36 +1,36 @@
 ﻿/*global require*/
 require([
-	"esri/map", "esri/dijit/Geocoder", "route-ui", "esri/graphic", "esri/tasks/RouteTask", "esri/tasks/RouteParameters"
-], function (Map, Geocoder, RouteUI, Graphic, RouteTask, RouteParameters) {
+	"esri/urlUtils",
+	"esri/map", "esri/dijit/Geocoder", "route-ui", "esri/graphic", "esri/tasks/RouteTask", "esri/tasks/RouteParameters",
+	"esri/tasks/FeatureSet"
+], function (urlUtils, Map, Geocoder, RouteUI, Graphic, RouteTask, RouteParameters, FeatureSet) {
 	var map, routeUI, geocoder, routeTask;
-	map = new Map("map", {
-		basemap: "gray",
-		center: [-120.80566406246835, 47.41322033015946],
-		zoom: 7
-	});
-	routeUI = new RouteUI();
-	routeTask = new RouteTask("http://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World/");
-	document.getElementById("toolsPane").appendChild(routeUI.form);
 
-	routeUI.on("route-params-submit", function (e) {
-		console.log("route-parameters-submitted", e);
+	// Set up the proxy for the routing service.
+	urlUtils.addProxyRule({
+		urlPrefix: "route.arcgis.com",
+		proxyUrl: "proxy/proxy.ashx"
 	});
+
 	/** Shows an info window for the current feature and also centers the map at that location.
 	 * @param {Event} e
 	 * @param {Object} e.feature - A regular object that can be used to construct a Graphic;
 	 */
-	routeUI.on("stop-goto-link-click", function (e) {
+	function showInfoWindow(e) {
 		var feature = e.feature;
 		feature = new Graphic(feature);
 		feature.setInfoTemplate({content: "${*}", title: "${name}"});
 		map.infoWindow.setFeatures([feature]);
 		map.infoWindow.show(feature.geometry);
 		map.centerAt(feature.geometry);
-	});
+	}
 
-	map.on("load", function () {
-
-
+	/**
+	 * Setup the geocoder widget.
+	 */
+	function setupGeocoder() {
+		// Create the geocoder widget. 
+		// Its searches will be limited to the map's initial extent.
 		geocoder = new Geocoder({
 			map: map,
 			arcgisGeocoder: {
@@ -73,7 +73,64 @@ require([
 
 		geocoder.on("find-results", onResult);
 		geocoder.on("select", onResult);
+	}
+
+
+	map = new Map("map", {
+		basemap: "gray",
+		center: [-120.80566406246835, 47.41322033015946],
+		zoom: 7
 	});
+	routeUI = new RouteUI();
+	routeTask = new RouteTask("http://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World/");
+	document.getElementById("toolsPane").appendChild(routeUI.form);
+
+	/**
+	 * @typedef {Object.<string, Array>} SolveCompleteResult
+	 * @property {RouteResult[]} routeResults
+	 * @property {Graphic[]} barriers
+	 * @property {Graphic[]} polygonBarriers
+	 * @property {Graphic[]} polylineBarriers
+	 * @property {NAMessage[]} message
+	 */
+
+	/**
+	 * @typedef {Object} RouteSubmitDetail
+	 * @property {string[]} restrictionAttributes
+	 * @property {Array.<Object.<string, (string,number)>>} attributeParameterValues
+	 * @property {Object[]} stops - An array of objects that can be converted into Graphics.
+	 */
+
+	/**
+	 * @param {RouteSubmitDetail} e
+	 */
+	routeUI.on("route-params-submit", function (e) {
+		var routeParameters;
+		console.log("dojo/Evented event - route-parameters-submitted", e);
+		routeParameters = new RouteParameters();
+		routeParameters.restrictionAttributes = e.restrictionAttributes;
+		routeParameters.attributeParameterValues = e.attributeParameterValues;
+		routeParameters.stops = new FeatureSet();
+		routeParameters.doNotLocateOnRestrictedElements = true;
+		e.stops.forEach(function (stop) {
+			var graphic = new Graphic(stop);
+			routeParameters.stops.features.push(graphic);
+		});
+
+		routeTask.solve(routeParameters, function (/**{SolveCompleteResult}*/ result) {
+			console.log("Route solve complete", result);
+		}, function (/**{Error}*/ error) {
+			console.error("Route solve error", error);
+		});
+	});
+
+	routeUI.form.addEventListener("route-params-submit", function (e) {
+		console.log("Native event - route-params-submit", e.detail);
+	});
+
+	routeUI.on("stop-goto-link-click", showInfoWindow);
+
+	map.on("load", setupGeocoder);
 
 
 });

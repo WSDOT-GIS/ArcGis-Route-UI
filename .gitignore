@@ -5,6 +5,7 @@
 *.suo
 *.user
 *.sln.docstates
+proxy.config
 
 # Build results
 [Dd]ebug/
