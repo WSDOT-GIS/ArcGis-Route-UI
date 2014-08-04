@@ -164,6 +164,7 @@ require([
 		routeParameters.attributeParameterValues = e.attributeParameterValues;
 		routeParameters.stops = new FeatureSet();
 		routeParameters.doNotLocateOnRestrictedElements = true;
+		routeParameters.returnDirections = true;
 		e.stops.forEach(function (stop) {
 			var graphic = new Graphic(stop);
 			routeParameters.stops.features.push(graphic);

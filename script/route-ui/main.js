@@ -420,6 +420,7 @@ define([
 			feature.attributes.Name = stop.name;
 			li = document.createElement("li");
 			li.id = createId("stop_" + stop.name);
+			li.setAttribute("data-score", feature.attributes.score);
 			feature.attributes.id = li.id;
 			li.classList.add("stop");
 			li.classList.add("list-group-item");
@@ -457,6 +458,14 @@ define([
 			removeLink.onclick =removeItemFromList;
 		}
 		return li;
+	}
+
+	function removeNonStopAttributes(feature) {
+		["id", "score"].forEach(function (attributeName) {
+			if (feature.attributes.hasOwnProperty(attributeName)) {
+				delete feature.attributes[attributeName];
+			}
+		});
 	}
 
 
@@ -510,6 +519,7 @@ define([
 				li = stopListItems[i];
 				feature = li.getAttribute(geocodeResultDataAttributeName);
 				feature = JSON.parse(feature);
+				removeNonStopAttributes(feature);
 				stops.push(feature);
 			}
 
