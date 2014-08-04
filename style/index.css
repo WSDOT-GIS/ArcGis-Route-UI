@@ -2,7 +2,27 @@
 	width: 100%;
 	height: 100%;
 	margin: 0;
-	overflow-y:hidden;
+	/*overflow-y:hidden;*/
+}
+
+@-moz-viewport {
+	height: device-height;
+	width: device-width;
+}
+
+@-ms-viewport {
+	height: device-height;
+	width: device-width;
+}
+
+@-webkit-viewport {
+	height: device-height;
+	width: device-width;
+}
+
+@viewport {
+	height: device-height;
+	width: device-width;
 }
 
 #toolsPane {
@@ -32,10 +52,6 @@ label + input, label + select {
 
 #Stops .panel-body {
 	max-height: 300px;
-}
-
-#Restrictions .panel-body {
-	max-height: 400px;
 }
 
 #routes_layer path {

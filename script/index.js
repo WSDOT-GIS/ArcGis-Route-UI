@@ -10,7 +10,8 @@ require([
 	"esri/tasks/FeatureSet",
 	"esri/layers/GraphicsLayer",
 	"esri/renderers/SimpleRenderer",
-	"esri/symbols/SimpleMarkerSymbol"
+	"esri/symbols/SimpleMarkerSymbol",
+	"dojo/domReady!"
 ], function (urlUtils, Map, Geocoder, RouteUI, Graphic, RouteTask, RouteParameters, FeatureSet, GraphicsLayer, SimpleRenderer, SimpleMarkerSymbol) {
 	var map, routeUI, geocoder, routeTask, stopsLayer, routesLayer;
 
@@ -19,6 +20,19 @@ require([
 		urlPrefix: "route.arcgis.com",
 		proxyUrl: "proxy/proxy.ashx"
 	});
+
+	function setHeights() {
+		var toolsPane = document.getElementById("toolsPane");
+		var simpleGeocoder = document.getElementById("geocoder");
+		var stopsPanel = document.getElementById("Stops");
+		var restrictionsPanel = document.getElementById("Restrictions");
+		var restrictionsPanelBody = restrictionsPanel.querySelector(".panel-body");
+		var btnGroup = toolsPane.querySelector("button[type=submit]").parentNode.parentNode;
+
+		restrictionsPanelBody.style.height = [Math.round((
+			(toolsPane.clientHeight - stopsPanel.clientHeight - simpleGeocoder.clientHeight - btnGroup.clientHeight) / 2
+			)), "px"].join("");
+	}
 
 	function removeGraphicWithMatchingId(layer, id) {
 		var graphic;
@@ -188,6 +202,13 @@ require([
 
 	map.on("load", setupGeocoder);
 
+	setHeights();
+
+	window.addEventListener("resize", setHeights);
+	window.addEventListener("deviceorientation", setHeights);
+
 	$("#disclaimer").modal();
+
+
 
 });

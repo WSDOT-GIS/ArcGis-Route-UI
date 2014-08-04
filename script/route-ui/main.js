@@ -44,7 +44,6 @@ define([
 	 * @param {*} detail - The data passed when initializing the event.
 	 */
 
-
 	/**
 	 * @param {string} eventType
 	 * @param {CustomEventInit} params
@@ -77,6 +76,8 @@ define([
 
 		return customEvent;
 	}
+
+
 
 	// Add an Array.contains function if it does not already exist.
 	if (!Array.prototype.contains) {
@@ -303,6 +304,7 @@ define([
 
 		submitButton = document.createElement("button");
 		submitButton.type = "submit";
+		submitButton.disabled = true;
 		submitButton.textContent = "Submit";
 		submitButton.setAttribute("class", "btn btn-primary");
 		innerBtnGroup.appendChild(submitButton);
@@ -474,6 +476,15 @@ define([
 		properties: null,
 		descriptions: null,
 		stopList: null,
+		disableSubmitIfNotEnoughStops: function() {
+			var stopListItems = this.stopList.querySelectorAll("li.stop");
+			var submitButton = this.form.querySelector("button[type=submit]");
+			if (stopListItems.length < 2) {
+				submitButton.disabled = true;
+			} else {
+				submitButton.disabled = false;
+			}
+		},
 		/**
 		 * Adds or removes the 'only-has-one-stop' class from the stop list.
 		 */
@@ -601,7 +612,10 @@ define([
 					self.emit("stop-remove", { stopId: e.currentTarget.parentElement.parentElement.id });
 					self._setStopListClass();
 					// TODO: Emit equivalent native custom event.
+					self.disableSubmitIfNotEnoughStops();
 				});
+
+				self.disableSubmitIfNotEnoughStops();
 			}
 		},
 		/**
