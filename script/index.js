@@ -188,5 +188,7 @@ require([
 
 	map.on("load", setupGeocoder);
 
+	$("#disclaimer").modal();
 
+	//document.querySelector(".simpleGeocoder input").focus();
 });
