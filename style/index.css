@@ -37,3 +37,9 @@ label + input, label + select {
 #Restrictions .panel-body {
 	max-height: 400px;
 }
+
+#routes_layer path {
+	stroke: blue;
+	stroke-width: 0.3em;
+	stroke-opacity: 1;
+}

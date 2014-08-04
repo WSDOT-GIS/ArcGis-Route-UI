@@ -12,7 +12,7 @@ require([
 	"esri/renderers/SimpleRenderer",
 	"esri/symbols/SimpleMarkerSymbol"
 ], function (urlUtils, Map, Geocoder, RouteUI, Graphic, RouteTask, RouteParameters, FeatureSet, GraphicsLayer, SimpleRenderer, SimpleMarkerSymbol) {
-	var map, routeUI, geocoder, routeTask, stopsLayer;
+	var map, routeUI, geocoder, routeTask, stopsLayer, routesLayer;
 
 	// Set up the proxy for the routing service.
 	urlUtils.addProxyRule({
@@ -105,12 +105,19 @@ require([
 		id: "stops"
 	});
 
+	routesLayer = new GraphicsLayer({
+		id: "routes",
+		styling: false // Use CSS to style the lines.
+	});
+
+	// Setup styling for stops layer.
 	(function () {
 		var symbol = new SimpleMarkerSymbol();
 		var renderer = new SimpleRenderer(symbol);
 		stopsLayer.setRenderer(renderer);
-		map.addLayer(stopsLayer);
 	}());
+	map.addLayer(stopsLayer);
+	map.addLayer(routesLayer);
 
 	routeUI = new RouteUI();
 	routeTask = new RouteTask("http://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World/");
@@ -149,7 +156,13 @@ require([
 		});
 
 		routeTask.solve(routeParameters, function (/**{SolveCompleteResult}*/ result) {
+			var routeResult;
 			console.log("Route solve complete", result);
+			routesLayer.clear();
+			for (var i = 0, l = result.routeResults.length; i < l; i += 1) {
+				routeResult = result.routeResults[i];
+				routesLayer.add(routeResult.route);
+			}
 		}, function (/**{Error}*/ error) {
 			console.error("Route solve error", error);
 		});
