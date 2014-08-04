@@ -190,5 +190,4 @@ require([
 
 	$("#disclaimer").modal();
 
-	//document.querySelector(".simpleGeocoder input").focus();
 });

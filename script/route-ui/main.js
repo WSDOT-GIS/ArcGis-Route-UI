@@ -475,6 +475,17 @@ define([
 		descriptions: null,
 		stopList: null,
 		/**
+		 * Adds or removes the 'only-has-one-stop' class from the stop list.
+		 */
+		_setStopListClass: function() {
+			var stopListItems = this.stopList.querySelectorAll("li");
+			if (stopListItems.length === 1) {
+				this.stopList.classList.add("only-has-one-stop");
+			} else {
+				this.stopList.classList.remove("only-has-one-stop");
+			}
+		},
+		/**
 		 * Gets an array of stop features.
 		 * @returns {Array.<external:Feature>}
 		 */
@@ -576,6 +587,7 @@ define([
 			} else if (stop.feature) {
 				li = createStopListItem(stop);
 				this.stopList.appendChild(li);
+				this._setStopListClass();
 				gotoLink = li.querySelector(".goto-link");
 				gotoLink.onclick = emitGotoEvent;
 				self.emit("stop-add", {
@@ -587,6 +599,7 @@ define([
 				removeLink = li.querySelector(".remove-link");
 				removeLink.addEventListener("click", function (e) {
 					self.emit("stop-remove", { stopId: e.currentTarget.parentElement.parentElement.id });
+					self._setStopListClass();
 					// TODO: Emit equivalent native custom event.
 				});
 			}
@@ -613,7 +626,7 @@ define([
 					self.form.dispatchEvent(customEvent);
 				}
 
-				// TODO: Actually emit the parameters that the user submitted.
+				// Emit the parameters that the user submitted.
 				self.emit("route-params-submit", detail);
 
 				return false;
