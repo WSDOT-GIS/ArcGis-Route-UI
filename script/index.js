@@ -1,16 +1,35 @@
 ﻿/*global require*/
 require([
 	"esri/urlUtils",
-	"esri/map", "esri/dijit/Geocoder", "route-ui", "esri/graphic", "esri/tasks/RouteTask", "esri/tasks/RouteParameters",
-	"esri/tasks/FeatureSet"
-], function (urlUtils, Map, Geocoder, RouteUI, Graphic, RouteTask, RouteParameters, FeatureSet) {
-	var map, routeUI, geocoder, routeTask;
+	"esri/map",
+	"esri/dijit/Geocoder",
+	"route-ui",
+	"esri/graphic",
+	"esri/tasks/RouteTask",
+	"esri/tasks/RouteParameters",
+	"esri/tasks/FeatureSet",
+	"esri/layers/GraphicsLayer",
+	"esri/renderers/SimpleRenderer",
+	"esri/symbols/SimpleMarkerSymbol"
+], function (urlUtils, Map, Geocoder, RouteUI, Graphic, RouteTask, RouteParameters, FeatureSet, GraphicsLayer, SimpleRenderer, SimpleMarkerSymbol) {
+	var map, routeUI, geocoder, routeTask, stopsLayer;
 
 	// Set up the proxy for the routing service.
 	urlUtils.addProxyRule({
 		urlPrefix: "route.arcgis.com",
 		proxyUrl: "proxy/proxy.ashx"
 	});
+
+	function removeGraphicWithMatchingId(layer, id) {
+		var graphic;
+		for (var i = 0, l = layer.graphics.length; i < l; i += 1) {
+			graphic = layer.graphics[i];
+			if (graphic.attributes.id === id) {
+				layer.remove(graphic);
+				break;
+			}
+		}
+	}
 
 	/** Shows an info window for the current feature and also centers the map at that location.
 	 * @param {Event} e
@@ -81,6 +100,18 @@ require([
 		center: [-120.80566406246835, 47.41322033015946],
 		zoom: 7
 	});
+
+	stopsLayer = new GraphicsLayer({
+		id: "stops"
+	});
+
+	(function () {
+		var symbol = new SimpleMarkerSymbol();
+		var renderer = new SimpleRenderer(symbol);
+		stopsLayer.setRenderer(renderer);
+		map.addLayer(stopsLayer);
+	}());
+
 	routeUI = new RouteUI();
 	routeTask = new RouteTask("http://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World/");
 	document.getElementById("toolsPane").appendChild(routeUI.form);
@@ -129,6 +160,18 @@ require([
 	});
 
 	routeUI.on("stop-goto-link-click", showInfoWindow);
+
+	routeUI.on("stop-add", function (e) {
+		console.log("stop-add", e);
+		var feature = e.feature;
+		feature = new Graphic(feature);
+		stopsLayer.add(feature);
+	});
+
+	routeUI.on("stop-remove", function (e) {
+		console.log("stop-remove", e.stopId);
+		removeGraphicWithMatchingId(stopsLayer, e.stopId);
+	});
 
 	map.on("load", setupGeocoder);
 

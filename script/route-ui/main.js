@@ -7,7 +7,7 @@ define([
 	"dojo/text!./data/sync/Attribute Names.txt",
 	"dojo/text!./data/async/Restrictions.txt"
 ], function (Evented, declare, syncValues, asyncValues, syncDescriptions, asyncDescriptions) {
-	var usedIds = [], supportsCustomEventConstructor = true, geocodeResultDataAttributeName = "data-geocode-result";
+	var usedIds = [], supportsCustomEventConstructor = true, geocodeResultDataAttributeName = "data-feature";
 
 	// These should be checked by default.
 	var defaultRestrictionAttributeNamesRe = /^(?:(?:Avoid Carpool Roads)|(?:Avoid Express Lanes)|(?:Avoid Gates)|(?:Avoid Private Roads)|(?:Avoid Unpaved Roads)|(?:Driving an Automobile)|(?:Roads Under Construction Prohibited)|(?:Through Traffic Prohibited))$/;
@@ -405,7 +405,7 @@ define([
 	/**
 	 * Create a list item representing a geocode result.
 	 * @param {Object} stop
-	 * @returns {HTMLLIElement} - The <li> element with have a data-geocode-result attribute.
+	 * @returns {HTMLLIElement} - The <li> element with have a data-feature attribute.
 	 */
 	function createStopListItem(stop) {
 		var li, removeLink, feature, gotoLink, span, btnGroup;
@@ -417,6 +417,8 @@ define([
 			}
 			feature.attributes.Name = stop.name;
 			li = document.createElement("li");
+			li.id = createId("stop_" + stop.name);
+			feature.attributes.id = li.id;
 			li.classList.add("stop");
 			li.classList.add("list-group-item");
 
@@ -551,7 +553,7 @@ define([
 		 * @param {external:Feature} stop
 		 */
 		addStop: function (stop) {
-			var li, self = this, gotoLink;
+			var li, self = this, gotoLink, removeLink;
 
 			/**
 			 * Emits an event that indicates one of the stops' "goto" links have been clicked.
@@ -576,6 +578,17 @@ define([
 				this.stopList.appendChild(li);
 				gotoLink = li.querySelector(".goto-link");
 				gotoLink.onclick = emitGotoEvent;
+				self.emit("stop-add", {
+					stop: stop,
+					feature: JSON.parse(li.getAttribute(geocodeResultDataAttributeName)),
+					id: li.id
+				});
+
+				removeLink = li.querySelector(".remove-link");
+				removeLink.addEventListener("click", function (e) {
+					self.emit("stop-remove", { stopId: e.currentTarget.parentElement.parentElement.id });
+					// TODO: Emit equivalent native custom event.
+				});
 			}
 		},
 		/**
