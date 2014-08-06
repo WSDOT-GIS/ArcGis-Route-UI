@@ -135,7 +135,7 @@ require([
 
 	routeUI = new RouteUI();
 	routeTask = new RouteTask("http://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World/");
-	document.getElementById("toolsPane").appendChild(routeUI.form);
+	document.getElementById("toolsPane").insertBefore(routeUI.form, document.getElementById("directionsPanel"));
 
 	/**
 	 * @typedef {Object.<string, Array>} SolveCompleteResult
@@ -171,13 +171,30 @@ require([
 		});
 
 		routeTask.solve(routeParameters, function (/**{SolveCompleteResult}*/ result) {
-			var routeResult;
+			var routeResult, dirList, dirPanelBody, dirPanel;
+
+			dirPanel = document.getElementById("directionsPanel");
 			console.log("Route solve complete", result);
 			routesLayer.clear();
 			for (var i = 0, l = result.routeResults.length; i < l; i += 1) {
 				routeResult = result.routeResults[i];
 				routesLayer.add(routeResult.route);
 			}
+
+			dirPanelBody = dirPanel.querySelector(".panel-body");
+
+			// Remove existing directions.
+
+			dirList = document.getElementById("dirList");
+			if (dirList) {
+				dirList.parentElement.removeChild(dirList);
+			}
+
+			dirList = RouteUI.createDirectionsList(result.routeResults[0].directions);
+			dirList.id = "dirList";
+			dirPanelBody.appendChild(dirList);
+
+			$("#dirPanel").show();
 		}, function (/**{Error}*/ error) {
 			console.error("Route solve error", error);
 		});

@@ -41,9 +41,7 @@
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <Content Include="index.html" />
     <Content Include="script\index.js" />
@@ -60,6 +58,7 @@
   <ItemGroup>
     <Content Include="proxy\proxy.ashx" />
     <Content Include="proxy\proxy.config" />
+    <None Include="Properties\PublishProfiles\Test.pubxml" />
     <None Include="proxy\proxy.xsd">
       <SubType>Designer</SubType>
     </None>

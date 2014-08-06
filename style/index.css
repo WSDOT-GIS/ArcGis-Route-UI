@@ -60,7 +60,7 @@ label + input, label + select {
 	stroke-opacity: 1;
 }
 
-.stop-list:empty:after, .only-has-one-stop:after {
+.stop-list:empty:after, .only-has-one-stop:after, .directions-panel {
 	font-style: italic;
 	color: #a1a1a1;
 }
@@ -71,4 +71,12 @@ label + input, label + select {
 
 .only-has-one-stop:after {
 	content: 'You only have one stop. You need at least two to create a route.';
+}
+
+.esriDMTDepart {
+	background-color: lightgreen;
+}
+
+.esriDMTStop {
+	background-color: #ff7070;
 }

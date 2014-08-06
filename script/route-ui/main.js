@@ -672,6 +672,42 @@ define([
 		}
 	});
 
+	function createDirectionsList(directions) {
+		var list, docFrag;
+
+		list = document.createElement("ol");
+		list.classList.add("list-group");
+		list.classList.add("directions-list");
+
+		docFrag = document.createDocumentFragment();
+
+		/**
+		 * @param {Graphic} feature - Each feature will have the following attributes: text, length, time, ETA, maneuverType. {@see https://developers.arcgis.com/javascript/jsapi/directionsfeatureset-amd.html DirectionsFeatureSet}
+		 */
+		directions.features.forEach(function (feature) {
+			var li, textNode, badge, attr;
+			attr = feature.attributes;
+			li = document.createElement("li");
+			li.classList.add("list-group-item");
+			li.classList.add(attr.maneuverType);
+			textNode = document.createTextNode(attr.text);
+			if (attr.length) {
+				badge = document.createElement("span");
+				badge.classList.add("badge");
+				badge.textContent = Math.round(attr.length * 100) / 100;
+				li.appendChild(badge);
+			}
+			li.appendChild(textNode);
+			docFrag.appendChild(li);
+		});
+
+		list.appendChild(docFrag);
+
+		return list;
+	}
+
+	ArcGisRouteUI.createDirectionsList = createDirectionsList;
+
 
 
 	return ArcGisRouteUI;
