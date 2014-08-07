@@ -65,7 +65,7 @@ This event is triggered when a stop's goto button is clicked.
 
 ##### Example #####
 
-```
+```javascript
 /** Shows an info window for the current feature and also centers the map at that location.
 	* @param {Event} e
 	* @param {Object} e.feature - A regular object that can be used to construct a Graphic;
