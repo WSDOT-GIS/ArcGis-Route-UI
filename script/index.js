@@ -1,232 +1,228 @@
-﻿/*global require*/
+/* eslint-env amd,jquery,browser */
 require([
-	"esri/urlUtils",
-	"esri/map",
-	"esri/dijit/Geocoder",
-	"route-ui",
-	"esri/graphic",
-	"esri/tasks/RouteTask",
-	"esri/tasks/RouteParameters",
-	"esri/tasks/FeatureSet",
-	"esri/layers/GraphicsLayer",
-	"esri/renderers/SimpleRenderer",
-	"esri/symbols/SimpleMarkerSymbol",
-	"dojo/domReady!"
+  'esri/urlUtils',
+  'esri/map',
+  'esri/dijit/Geocoder',
+  'route-ui',
+  'esri/graphic',
+  'esri/tasks/RouteTask',
+  'esri/tasks/RouteParameters',
+  'esri/tasks/FeatureSet',
+  'esri/layers/GraphicsLayer',
+  'esri/renderers/SimpleRenderer',
+  'esri/symbols/SimpleMarkerSymbol',
+  'dojo/domReady!'
 ], function (urlUtils, Map, Geocoder, RouteUI, Graphic, RouteTask, RouteParameters, FeatureSet, GraphicsLayer, SimpleRenderer, SimpleMarkerSymbol) {
-	var map, routeUI, geocoder, routeTask, stopsLayer, routesLayer;
+  var map, routeUI, geocoder, routeTask, stopsLayer, routesLayer
 
-	// Set up the proxy for the routing service.
-	urlUtils.addProxyRule({
-		urlPrefix: "route.arcgis.com",
-		proxyUrl: "proxy/proxy.ashx"
-	});
+  // Set up the proxy for the routing service.
+  urlUtils.addProxyRule({
+    urlPrefix: 'route.arcgis.com',
+    proxyUrl: 'proxy/proxy.ashx'
+  })
 
-	function setHeights() {
-		var toolsPane = document.getElementById("toolsPane");
-		var simpleGeocoder = document.getElementById("geocoder");
-		var stopsPanel = document.getElementById("Stops");
-		var restrictionsPanel = document.getElementById("Restrictions");
-		var restrictionsPanelBody = restrictionsPanel.querySelector(".panel-body");
-		var btnGroup = toolsPane.querySelector("button[type=submit]").parentNode.parentNode;
+  function setHeights () {
+    var toolsPane = document.getElementById('toolsPane')
+    var simpleGeocoder = document.getElementById('geocoder')
+    var stopsPanel = document.getElementById('Stops')
+    var restrictionsPanel = document.getElementById('Restrictions')
+    var restrictionsPanelBody = restrictionsPanel.querySelector('.panel-body')
+    var btnGroup = toolsPane.querySelector('button[type=submit]').parentNode.parentNode
 
-		restrictionsPanelBody.style.height = [Math.round((
-			(toolsPane.clientHeight - stopsPanel.clientHeight - simpleGeocoder.clientHeight - btnGroup.clientHeight) / 2
-			)), "px"].join("");
-	}
+    restrictionsPanelBody.style.height = [Math.round((
+      (toolsPane.clientHeight - stopsPanel.clientHeight - simpleGeocoder.clientHeight - btnGroup.clientHeight) / 2
+      )), 'px'].join('')
+  }
 
-	function removeGraphicWithMatchingId(layer, id) {
-		var graphic;
-		for (var i = 0, l = layer.graphics.length; i < l; i += 1) {
-			graphic = layer.graphics[i];
-			if (graphic.attributes.id === id) {
-				layer.remove(graphic);
-				break;
-			}
-		}
-	}
+  function removeGraphicWithMatchingId (layer, id) {
+    var graphic
+    for (var i = 0, l = layer.graphics.length; i < l; i += 1) {
+      graphic = layer.graphics[i]
+      if (graphic.attributes.id === id) {
+        layer.remove(graphic)
+        break
+      }
+    }
+  }
 
-	/** Shows an info window for the current feature and also centers the map at that location.
-	 * @param {Event} e
-	 * @param {Object} e.feature - A regular object that can be used to construct a Graphic;
-	 */
-	function showInfoWindow(e) {
-		var feature = e.feature;
-		feature = new Graphic(feature);
-		feature.setInfoTemplate({content: "${*}", title: "${name}"});
-		map.infoWindow.setFeatures([feature]);
-		map.infoWindow.show(feature.geometry);
-		map.centerAt(feature.geometry);
-	}
+  /** Shows an info window for the current feature and also centers the map at that location.
+   * @param {Event} e
+   * @param {Object} e.feature - A regular object that can be used to construct a Graphic;
+   */
+  function showInfoWindow (e) {
+    var feature = e.feature
+    feature = new Graphic(feature)
+    feature.setInfoTemplate({content: '${*}', title: '${name}'}) // eslint-disable-line no-template-curly-in-string
+    map.infoWindow.setFeatures([feature])
+    map.infoWindow.show(feature.geometry)
+    map.centerAt(feature.geometry)
+  }
 
-	/**
-	 * Setup the geocoder widget.
-	 */
-	function setupGeocoder() {
-		// Create the geocoder widget. 
-		// Its searches will be limited to the map's initial extent.
-		geocoder = new Geocoder({
-			map: map,
-			arcgisGeocoder: {
-				placeholder: "Add stop",
-				sourceCountry: "US",
-				searchExtent: map.extent
-			},
-			autoComplete: true
-		}, "geocoder");
+  /**
+   * Setup the geocoder widget.
+   */
+  function setupGeocoder () {
+    // Create the geocoder widget.
+    // Its searches will be limited to the map's initial extent.
+    geocoder = new Geocoder({
+      map: map,
+      arcgisGeocoder: {
+        placeholder: 'Add stop',
+        sourceCountry: 'US',
+        searchExtent: map.extent
+      },
+      autoComplete: true
+    }, 'geocoder')
 
-		/**
-		 * @typedef GeocodeResult
-		 * @property {Extent} extent
-		 * @property {Graphic} feature
-		 * @property {string} name
-		 */
+    /**
+     * @typedef GeocodeResult
+     * @property {Extent} extent
+     * @property {Graphic} feature
+     * @property {string} name
+     */
 
-		/**
-		 * @typedef SelectResult
-		 * @property {GeocodeResult} result
-		 */
+    /**
+     * @typedef SelectResult
+     * @property {GeocodeResult} result
+     */
 
-		/**
-		 * @typedef FindResult
-		 * @property {GeocodeResult[]} results
-		 * @property {string} value
-		 */
+    /**
+     * @typedef FindResult
+     * @property {GeocodeResult[]} results
+     * @property {string} value
+     */
 
-		/**
-		 * @param {(SelectResult|FindResult)} result
-		 */
-		function onResult(result) {
-			var results = result.results ? result.results.results : result.result ? [result.result] : null;
-			if (results) {
-				results.forEach(function (result) {
-					routeUI.addStop(result);
-				});
-			}
-		}
+    /**
+     * @param {(SelectResult|FindResult)} result
+     */
+    function onResult (result) {
+      var results = result.results ? result.results.results : result.result ? [result.result] : null
+      if (results) {
+        results.forEach(function (result) {
+          routeUI.addStop(result)
+        })
+      }
+    }
 
-		geocoder.on("find-results", onResult);
-		geocoder.on("select", onResult);
-	}
+    geocoder.on('find-results', onResult)
+    geocoder.on('select', onResult)
+  }
 
+  map = new Map('map', {
+    basemap: 'gray',
+    center: [-120.80566406246835, 47.41322033015946],
+    zoom: 7
+  })
 
-	map = new Map("map", {
-		basemap: "gray",
-		center: [-120.80566406246835, 47.41322033015946],
-		zoom: 7
-	});
+  stopsLayer = new GraphicsLayer({
+    id: 'stops'
+  })
 
-	stopsLayer = new GraphicsLayer({
-		id: "stops"
-	});
+  routesLayer = new GraphicsLayer({
+    id: 'routes',
+    styling: false // Use CSS to style the lines.
+  });
 
-	routesLayer = new GraphicsLayer({
-		id: "routes",
-		styling: false // Use CSS to style the lines.
-	});
+  // Setup styling for stops layer.
+  (function () {
+    var symbol = new SimpleMarkerSymbol()
+    var renderer = new SimpleRenderer(symbol)
+    stopsLayer.setRenderer(renderer)
+  }())
+  map.addLayer(stopsLayer)
+  map.addLayer(routesLayer)
 
-	// Setup styling for stops layer.
-	(function () {
-		var symbol = new SimpleMarkerSymbol();
-		var renderer = new SimpleRenderer(symbol);
-		stopsLayer.setRenderer(renderer);
-	}());
-	map.addLayer(stopsLayer);
-	map.addLayer(routesLayer);
+  routeUI = new RouteUI()
+  routeTask = new RouteTask('http://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World/')
+  document.getElementById('toolsPane').insertBefore(routeUI.form, document.getElementById('directionsPanel'))
 
-	routeUI = new RouteUI();
-	routeTask = new RouteTask("http://route.arcgis.com/arcgis/rest/services/World/Route/NAServer/Route_World/");
-	document.getElementById("toolsPane").insertBefore(routeUI.form, document.getElementById("directionsPanel"));
+  /**
+   * @typedef {Object.<string, Array>} SolveCompleteResult
+   * @property {RouteResult[]} routeResults
+   * @property {Graphic[]} barriers
+   * @property {Graphic[]} polygonBarriers
+   * @property {Graphic[]} polylineBarriers
+   * @property {NAMessage[]} message
+   */
 
-	/**
-	 * @typedef {Object.<string, Array>} SolveCompleteResult
-	 * @property {RouteResult[]} routeResults
-	 * @property {Graphic[]} barriers
-	 * @property {Graphic[]} polygonBarriers
-	 * @property {Graphic[]} polylineBarriers
-	 * @property {NAMessage[]} message
-	 */
+  /**
+   * @typedef {Object} RouteSubmitDetail
+   * @property {string[]} restrictionAttributes
+   * @property {Array.<Object.<string, (string,number)>>} attributeParameterValues
+   * @property {Object[]} stops - An array of objects that can be converted into Graphics.
+   */
 
-	/**
-	 * @typedef {Object} RouteSubmitDetail
-	 * @property {string[]} restrictionAttributes
-	 * @property {Array.<Object.<string, (string,number)>>} attributeParameterValues
-	 * @property {Object[]} stops - An array of objects that can be converted into Graphics.
-	 */
+  /**
+   * @param {RouteSubmitDetail} e
+   */
+  routeUI.on('route-params-submit', function (e) {
+    var routeParameters
+    console.log('dojo/Evented event - route-parameters-submitted', e)
+    routeParameters = new RouteParameters()
+    routeParameters.restrictionAttributes = e.restrictionAttributes
+    routeParameters.attributeParameterValues = e.attributeParameterValues
+    routeParameters.stops = new FeatureSet()
+    routeParameters.doNotLocateOnRestrictedElements = true
+    routeParameters.returnDirections = true
+    e.stops.forEach(function (stop) {
+      var graphic = new Graphic(stop)
+      routeParameters.stops.features.push(graphic)
+    })
 
-	/**
-	 * @param {RouteSubmitDetail} e
-	 */
-	routeUI.on("route-params-submit", function (e) {
-		var routeParameters;
-		console.log("dojo/Evented event - route-parameters-submitted", e);
-		routeParameters = new RouteParameters();
-		routeParameters.restrictionAttributes = e.restrictionAttributes;
-		routeParameters.attributeParameterValues = e.attributeParameterValues;
-		routeParameters.stops = new FeatureSet();
-		routeParameters.doNotLocateOnRestrictedElements = true;
-		routeParameters.returnDirections = true;
-		e.stops.forEach(function (stop) {
-			var graphic = new Graphic(stop);
-			routeParameters.stops.features.push(graphic);
-		});
+    routeTask.solve(routeParameters, function (/** {SolveCompleteResult} */ result) {
+      var routeResult, dirList, dirPanelBody, dirPanel
 
-		routeTask.solve(routeParameters, function (/**{SolveCompleteResult}*/ result) {
-			var routeResult, dirList, dirPanelBody, dirPanel;
+      dirPanel = document.getElementById('directionsPanel')
+      console.log('Route solve complete', result)
+      routesLayer.clear()
+      for (var i = 0, l = result.routeResults.length; i < l; i += 1) {
+        routeResult = result.routeResults[i]
+        routesLayer.add(routeResult.route)
+      }
 
-			dirPanel = document.getElementById("directionsPanel");
-			console.log("Route solve complete", result);
-			routesLayer.clear();
-			for (var i = 0, l = result.routeResults.length; i < l; i += 1) {
-				routeResult = result.routeResults[i];
-				routesLayer.add(routeResult.route);
-			}
+      dirPanelBody = dirPanel.querySelector('.panel-body')
 
-			dirPanelBody = dirPanel.querySelector(".panel-body");
+      // Remove existing directions.
 
-			// Remove existing directions.
+      dirList = document.getElementById('dirList')
+      if (dirList) {
+        dirList.parentElement.removeChild(dirList)
+      }
 
-			dirList = document.getElementById("dirList");
-			if (dirList) {
-				dirList.parentElement.removeChild(dirList);
-			}
+      dirList = RouteUI.createDirectionsList(result.routeResults[0].directions)
+      dirList.id = 'dirList'
+      dirPanelBody.appendChild(dirList)
 
-			dirList = RouteUI.createDirectionsList(result.routeResults[0].directions);
-			dirList.id = "dirList";
-			dirPanelBody.appendChild(dirList);
+      $('#dirPanel').show()
+    }, function (/** {Error} */ error) {
+      console.error('Route solve error', error)
+    })
+  })
 
-			$("#dirPanel").show();
-		}, function (/**{Error}*/ error) {
-			console.error("Route solve error", error);
-		});
-	});
+  routeUI.form.addEventListener('route-params-submit', function (e) {
+    console.log('Native event - route-params-submit', e.detail)
+  })
 
-	routeUI.form.addEventListener("route-params-submit", function (e) {
-		console.log("Native event - route-params-submit", e.detail);
-	});
+  routeUI.on('stop-goto-link-click', showInfoWindow)
 
-	routeUI.on("stop-goto-link-click", showInfoWindow);
+  routeUI.on('stop-add', function (e) {
+    console.log('stop-add', e)
+    var feature = e.feature
+    feature = new Graphic(feature)
+    stopsLayer.add(feature)
+  })
 
-	routeUI.on("stop-add", function (e) {
-		console.log("stop-add", e);
-		var feature = e.feature;
-		feature = new Graphic(feature);
-		stopsLayer.add(feature);
-	});
+  routeUI.on('stop-remove', function (e) {
+    console.log('stop-remove', e.stopId)
+    removeGraphicWithMatchingId(stopsLayer, e.stopId)
+  })
 
-	routeUI.on("stop-remove", function (e) {
-		console.log("stop-remove", e.stopId);
-		removeGraphicWithMatchingId(stopsLayer, e.stopId);
-	});
+  map.on('load', setupGeocoder)
 
-	map.on("load", setupGeocoder);
+  setHeights()
 
-	setHeights();
+  window.addEventListener('resize', setHeights)
+  window.addEventListener('deviceorientation', setHeights)
 
-	window.addEventListener("resize", setHeights);
-	window.addEventListener("deviceorientation", setHeights);
-
-	$("#disclaimer").modal();
-
-
-
-});
+  $('#disclaimer').modal()
+})

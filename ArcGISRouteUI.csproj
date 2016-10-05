@@ -51,13 +51,11 @@
     <Content Include="script\route-ui\data\sync\Attribute Parameter Values.txt" />
     <Content Include="script\route-ui\main.js" />
     <Content Include="style\index.css" />
-    <Content Include="style\index.min.css">
-      <DependentUpon>index.css</DependentUpon>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="proxy\proxy.ashx" />
     <Content Include="proxy\proxy.config" />
+    <Content Include=".eslintrc.json" />
     <None Include="Properties\PublishProfiles\Test.pubxml" />
     <None Include="proxy\proxy.xsd">
       <SubType>Designer</SubType>

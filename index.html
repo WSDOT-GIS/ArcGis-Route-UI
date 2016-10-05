@@ -1,70 +1,69 @@
 ﻿<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en-us">
 <head>
-	<title>ArcGIS Routing Parameters</title>
-	<link rel="stylesheet" href="//js.arcgis.com/3.10compact/js/esri/css/esri.css">
-	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
-	<link href="style/index.min.css" rel="stylesheet" />
-	<meta name="version" content="0.1.0" />
+    <title>ArcGIS Routing Parameters</title>
+    <link rel="stylesheet" href="//js.arcgis.com/3.18/esri/css/esri.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <link href="style/index.css" rel="stylesheet" />
+    <meta name="version" content="0.1.0" />
 </head>
 <body>
-	<div class="modal fade" id="disclaimer">
-		<div class="modal-dialog">
-			<div class="modal-content">
-				<div class="modal-header">
-					<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
-					<h4 class="modal-title">Disclaimer</h4>
-				</div>
-				<div class="modal-body">
-					<p>
-						For informational purposes only.
-						The routing information on this page is provided by a third party.
-					</p>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-				</div>
-			</div><!-- /.modal-content -->
-		</div><!-- /.modal-dialog -->
-	</div><!-- /.modal -->
+    <div class="modal fade" id="disclaimer">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                    <h4 class="modal-title">Disclaimer</h4>
+                </div>
+                <div class="modal-body">
+                    <p>
+                        For informational purposes only.
+                        The routing information on this page is provided by a third party.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
 
-	<div id="mainContainer" class="container-fluid">
+    <div id="mainContainer" class="container-fluid">
 
-		<div class="row">
-			<div class="col-md-9">
-				<div id="map"></div>
-			</div>
-			<div id="toolsPane" class="col-md-3 container">
-				<div id="geocoder"></div>
+        <div class="row">
+            <div class="col-md-9">
+                <div id="map"></div>
+            </div>
+            <div id="toolsPane" class="col-md-3 container">
+                <div id="geocoder"></div>
 
-				<div id="directionsPanel" class="panel panel-default">
-					<div class="panel-heading">Directions</div>
-					<div class="panel-body"></div>
-				</div>
-			</div>
-		</div>
-	</div>
+                <div id="directionsPanel" class="panel panel-default">
+                    <div class="panel-heading">Directions</div>
+                    <div class="panel-body"></div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-	<script>
-		(function () {
-			var root = location.pathname.replace(/\/[^\/]*$/, "");
-			var dojoConfig = {
-				async: true,
-				packages: [
-					{
-						name: "route-ui",
-						location: root + "/script/route-ui"
-					}
-				]
-			};
-			window.dojoConfig = dojoConfig;
-		}());
-	</script>
-	<script src="//js.arcgis.com/3.10compact/"></script>
-	<!-- Latest compiled and minified JavaScript -->
-	<script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
-	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-	<script src="script/index.js"></script>
+    <script>
+        (function () {
+            var root = location.pathname.replace(/\/[^\/]*$/, "");
+            var dojoConfig = {
+                async: true,
+                packages: [
+                    {
+                        name: "route-ui",
+                        location: root + "/script/route-ui"
+                    }
+                ]
+            };
+            window.dojoConfig = dojoConfig;
+        }());
+    </script>
+    <script src="//js.arcgis.com/3.18/init.js" integrity="sha384-9DiWFuyU+76qRyVdSBh1S4uJBiXBqtD1+UVs6i8nJF3UNwOpdcQYL77IiljeIqq3" crossorigin="anonymous"></script>
+    <script src="//code.jquery.com/jquery-3.1.1.min.js" integrity="sha384-3ceskX3iaEnIogmQchP8opvBy3Mi7Ce34nWjpBIwVTHfGYWQS9jwHDVRnpKKHJg7" crossorigin="anonymous"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script src="script/index.js"></script>
 </body>
 </html>
